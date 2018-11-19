@@ -23,11 +23,11 @@ void Controller::setTarget(Point[] checkpoints, int checkpointAmount, double tar
   isRotating = true;
 }
 
-double targetAngle, distanceToNode, currentSpeed, idealSpeed, idealRotation, rotationSpeed, targetedRotationSpeed;
+double targetAngle, distanceToNode, currentSpeed, idealSpeed, idealRotation, currentRotationSpeed, targetedRotationSpeed;
 void Controller::update(double posX, double posY, double currentAngle){
 
   currentSpeed = sqrt(pow(lastPosX-posX,2)+pow(lastPosY-posY, 2))/(micros()-lastUpdate);
-  rotationSpeed = (currentAngle-lastAngle)*ECART_ROUES/2*MAX_ACCELERATION;
+  currentRotationSpeed = (currentAngle-lastAngle)*ECART_ROUES/2*MAX_ACCELERATION;
   lastUpdate=micros();
   lastPosY = posY;
   lastPosX = posX;
@@ -65,9 +65,9 @@ void Controller::update(double posX, double posY, double currentAngle){
     //commande de rotation
     idealRotation = targetAngle*ECART_ROUES/2*MAX_ACCELERATION_ROTATION;
 
-    if(abs(rotationSpeed-idealSpeed)<MAX_ACCELERATION_ROTATION){
+    if(abs(currentRotationSpeed-idealSpeed)<MAX_ACCELERATION_ROTATION){
       targetedRotationSpeed = idealSpeed;
-    }else if(rotationSpeed<idealSpeed){
+    }else if(currentRotationSpeed<idealSpeed){
       targetedRotationSpeed += MAX_ACCELERATION_ROTATION;
     }else{
       targetedRotationSpeed -= MAX_ACCELERATION_ROTATION;

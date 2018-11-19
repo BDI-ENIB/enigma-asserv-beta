@@ -6,7 +6,10 @@
 #include <vector>
 
 #define MAX_ACCELERATION 0.2
+#define MAX_ACCELERATION_ROTATION 0.1
+#define MAX_PWM 255
 #define PRECISION 10
+#define ECART_ROUES 160
 
 typedef struct {double x,y;} Point;
 
@@ -32,7 +35,7 @@ class Controller{
     double targetedSpeed;
 
     long lastUpdate;
-    double lastPosX, lastPosY;
+    double lastPosX, lastPosY, lastAngle;
 
     int currentCheckpoint;
     int checkpointAmount;
@@ -40,7 +43,7 @@ class Controller{
     bool isRotating;
 
     // Sous-éléments du controller & autre
-    PID leftMotor, rightMotor;
+    PID leftMotor, rightMotor, curvature;
 
 };
 

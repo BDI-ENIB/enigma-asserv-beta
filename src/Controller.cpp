@@ -1,35 +1,10 @@
-/*
-class Controller{
-  public:
-    Controller(double P, double I, double D);
-    ** Commandes de création de trajectoire
-     * En gros l'idée c'est de décomposer nos trajectoires en clothoïdes.
-     *
-     typedef struct {double x,y;} Point;
-     void setTarget(Vector<Point> checkpoints, double targetAngle);
-
-    **
-     * Commandes de génération de commande
-     *
-    void update(double posX, double posY, double currentAngle);
-    int[] getCommand();
-
-  private:
-    // Définition de la trajectoire
-    std::vector<Point> checkpoints;
-    double targetedAngle;
-
-    // Sous-éléments du controller & autre
-    PID leftMotor, rightMotor;
-};
-*/
-
 #include "Controller.hpp"
 
 Controller::Controller(double P, double I, double D){
   // Asserv en vitesse => commande de base à 0, robot immobile
   leftMotor = new PID(P, I, D, 0);
   rightMotor = new PID(P, I, D, 0);
+  curvature = new PID(P, I, D, 0);
 
   lastUpdate=micros();
   lastPosY = 0.0;
@@ -48,13 +23,15 @@ void Controller::setTarget(Point[] checkpoints, int checkpointAmount, double tar
   isRotating = true;
 }
 
-double targetedAngle, distanceToNode, currentSpeed, idealSpeed;
+double targetAngle, distanceToNode, currentSpeed, idealSpeed, idealRotation, rotationSpeed, targetedRotationSpeed;
 void Controller::update(double posX, double posY, double currentAngle){
 
   currentSpeed = sqrt(pow(lastPosX-posX,2)+pow(lastPosY-posY, 2))/(micros()-lastUpdate);
+  rotationSpeed = (currentAngle-lastAngle)*ECART_ROUES/2*MAX_ACCELERATION;
   lastUpdate=micros();
   lastPosY = posY;
   lastPosX = posX;
+  lastAngle = currentAngle;
 
   targetSelection:;
 
@@ -65,7 +42,7 @@ void Controller::update(double posX, double posY, double currentAngle){
 
   // calcul de la distance et de l'angle à l'objectif:
   distanceToNode=sqrt(pow(checkpoints[currentCheckpoint].x-x,2)+pow(checkpoints[currentCheckpoint].y-y,2));
-  targetedAngle=atan2(ty-y,tx-x);
+  targetAngle=atan2(ty-y,tx-x); // cet angle doit tendre vers 0
 
   if(distanceToNode<PRECISION){
     currentCheckpoint++;
@@ -73,24 +50,41 @@ void Controller::update(double posX, double posY, double currentAngle){
     goto targetSelection;
   }
 
-  if(isRotating){
-    
+
+  // Calcul de la consigne en vitesse:
+  idealSpeed=distanceToNode/MAX_ACCELERATION;
+  if(abs(currentSpeed-idealSpeed)<MAX_ACCELERATION){
+    targetedSpeed = idealSpeed;
+  }else if(currentSpeed<idealSpeed){
+    targetedSpeed += MAX_ACCELERATION;
   }else{
-    // Calcul de la consigne en vitesse:
-    idealSpeed=distanceToNode/MAX_ACCELERATION;
-    if(abs(currentSpeed-idealSpeed)<MAX_ACCELERATION){
-      targetedSpeed = idealSpeed;
-    }else if(currentSpeed<idealSpeed){
-      targetedSpeed += MAX_ACCELERATION;
-    }else{
-      targetedSpeed -= MAX_ACCELERATION;
-    }
+    targetedSpeed -= MAX_ACCELERATION;
   }
 
+  if(isRotating){
+    //commande de rotation
+    idealRotation = targetAngle*ECART_ROUES/2*MAX_ACCELERATION_ROTATION;
+
+    if(abs(rotationSpeed-idealSpeed)<MAX_ACCELERATION_ROTATION){
+      targetedRotationSpeed = idealSpeed;
+    }else if(rotationSpeed<idealSpeed){
+      targetedRotationSpeed += MAX_ACCELERATION_ROTATION;
+    }else{
+      targetedRotationSpeed -= MAX_ACCELERATION_ROTATION;
+    }
+
+    leftMotor.setTarget(targetedSpeed+targetRotation);
+    rightMotor.setTarget(targetedSpeed-targetRotation);
+  }else{
+    leftMotor.setTarget(targetedSpeed);
+    rightMotor.setTarget(targetedSpeed);
+  }
+
+  curvature.update(targetAngle);
   leftMotor.update(currentSpeedL);
   rightMotor.update(currentSpeedR);
 }
 
 int[] Controller::getCommand(){
-  return [leftMotor.getCommand(), rightMotor.getCommand()];
+  return [max(-MAX_PWM, min(MAX_PWM, leftMotor.getCommand())), max(-MAX_PWM, min(MAX_PWM, rightMotor.getCommand()))];
 }

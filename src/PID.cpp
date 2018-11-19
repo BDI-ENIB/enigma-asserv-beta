@@ -38,6 +38,7 @@ void PID::update(double input){
   lastCommand += cumulatedError*I;
 
   // La partie dérivée:
+  // TODO: dérivée de l'erreur ou de la commande?
   lastCommand += (input-lastInput)*D;
 
   // On met à jour la var de sauvegarde de l'entrée

@@ -2,14 +2,14 @@
 #define CONTROLLER_H 1
 
 #include "PID.hpp"
-
-#include <vector>
+#include "Arduino.h"
 
 #define MAX_ACCELERATION 0.2
 #define MAX_ACCELERATION_ROTATION 0.1
 #define MAX_PWM 255
-#define PRECISION 10
-#define ECART_ROUES 160
+#define PRECISION_DISTANCE 10
+#define PRECISION_ANGLE 0.2
+#define DEMI_ECART_ROUES 160
 
 typedef struct {double x,y;} Point;
 
@@ -20,17 +20,18 @@ class Controller{
     /** Commandes de création de trajectoire
      * En gros l'idée c'est de décomposer nos trajectoires en clothoïdes.
      */
-     void setTarget(std::vector<Point> checkpoints, double targetedAngle);
+     void setTarget(Point *checkpoints, int checkpointAmount, double targetedAngle);
 
     /**
      * Commandes de génération de commande
      */
     void update(double posX, double posY, double currentAngle);
-    int[] getCommand();
+    int getLCommand();
+    int getRCommand();
 
   private:
     // Définition de la trajectoire
-    std::vector<Point> checkpoints;
+    Point *checkpoints;
     double targetedAngle;
     double targetedSpeed;
 
@@ -40,10 +41,10 @@ class Controller{
     int currentCheckpoint;
     int checkpointAmount;
 
-    bool isRotating;
+    bool rotationOnly;
 
     // Sous-éléments du controller & autre
-    PID leftMotor, rightMotor, curvature;
+    PID *leftMotor, *rightMotor, *curvature;
 
 };
 

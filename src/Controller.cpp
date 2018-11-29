@@ -4,7 +4,6 @@ Controller::Controller(double P, double I, double D){
   // Asserv en vitesse => commande de base à 0, robot immobile
   leftMotor = new PID(P, I, D, 0);
   rightMotor = new PID(P, I, D, 0);
-  curvature = new PID(P, I, D, 0);
 
   lastUpdate=micros();
   lastPosY = 0.0;
@@ -43,7 +42,7 @@ void Controller::update(double posX, double posY, double currentAngle){
   lastPosX = posX;
   lastAngle = currentAngle;
 
-  //targetSelection:;
+  targetSelection:;
 
   // Si on est arrivé à l'objectif, on ne fait plus rien
   if(currentCheckpoint>checkpointAmount){
@@ -54,15 +53,15 @@ void Controller::update(double posX, double posY, double currentAngle){
   distanceToNode=sqrt(pow(checkpoints[currentCheckpoint].x-posX,2)+pow(checkpoints[currentCheckpoint].y-posY,2));
   angleToTarget=atan2(checkpoints[currentCheckpoint].y-posY,checkpoints[currentCheckpoint].x-posX); // cet angle doit tendre vers 0
 
-  /*if(distanceToNode<PRECISION_DISTANCE){
+  if(distanceToNode<PRECISION_DISTANCE){
     currentCheckpoint++;
     rotationOnly = true;
     goto targetSelection;
-  }*/
+  }
 
-  /*if(angleToTarget<PRECISION_ANGLE){
+  if(angleToTarget<PRECISION_ANGLE){
     rotationOnly = false;
-  }*/
+  }
 
   if(rotationOnly){
     targetedSpeed = 0;
@@ -91,17 +90,14 @@ void Controller::update(double posX, double posY, double currentAngle){
   leftMotor->setTarget(targetedSpeed+targetedRotationSpeed);
   rightMotor->setTarget(targetedSpeed-targetedRotationSpeed);
 
-  curvature->update(angleToTarget);
   leftMotor->update(currentSpeed-currentRotationSpeed*DEMI_ECART_ROUES);
   rightMotor->update(currentSpeed+currentRotationSpeed*DEMI_ECART_ROUES);
 }
 
 int Controller::getLCommand(){
-  return 0;
   return max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()));
 }
 
 int Controller::getRCommand(){
-  return 0;
   return max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()));
 }

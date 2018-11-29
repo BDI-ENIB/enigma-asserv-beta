@@ -44,7 +44,7 @@ class Controller{
     bool rotationOnly;
 
     // Sous-éléments du controller & autre
-    PID *leftMotor, *rightMotor, *curvature;
+    PID *leftMotor, *rightMotor;
 
 };
 

@@ -37,11 +37,14 @@ void Controller::update(double posX, double posY, double currentAngle){
 
   currentSpeed = sqrt(pow(lastPosX-posX,2)+pow(lastPosY-posY, 2))/(micros()-lastUpdate);
   currentRotationSpeed = (currentAngle-lastAngle)*DEMI_ECART_ROUES;
+
   lastUpdate=micros();
   lastPosY = posY;
   lastPosX = posX;
   lastAngle = currentAngle;
 
+  // La relecture pique les yeux. Qui a mit un goto ici?? (oups) #doWhile
+  //TODO: refaire. Avec un switch case clair: Mode maintien de position, mode rotation, mode déplacement. 
   targetSelection:;
 
   // Si on est arrivé à l'objectif, on ne fait plus rien

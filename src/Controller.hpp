@@ -17,6 +17,7 @@ class Controller{
   public:
     Controller(double P, double I, double D);
 
+    //TODO: passer à un système position/vitesse
     /** Commandes de création de trajectoire
      * En gros l'idée c'est de décomposer nos trajectoires en clothoïdes.
      */

@@ -30,6 +30,7 @@ void PID::setTarget(double target){
 void PID::update(double input){
   // On incrémente l'erreur cumulée
   cumulatedError+=input-target;
+
   // TODO: Jarter cette variable quand on a un changement de target. En fait, créer une fonction pour reset le I, et laisser le controller gérer
 
   // Le proportionnel:
@@ -39,10 +40,9 @@ void PID::update(double input){
   lastCommand += cumulatedError*I;
 
   // La partie dérivée:
-  lastCommand += (input-target)*D;
+  lastCommand += (input-lastInput)*D;
 
   // On met à jour la var de sauvegarde de l'entrée
-  // TODO: repenser cette var
   lastInput = input;
 }
 

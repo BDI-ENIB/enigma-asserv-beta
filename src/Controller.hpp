@@ -19,7 +19,6 @@ class Controller{
 
     //TODO: passer à un système position/vitesse
     /** Commandes de création de trajectoire
-     * En gros l'idée c'est de décomposer nos trajectoires en clothoïdes.
      */
      void setTarget(Point *checkpoints, int checkpointAmount, double targetedAngle);
 

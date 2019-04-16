@@ -44,7 +44,7 @@ void Controller::update(double posX, double posY, double currentAngle){
   lastAngle = currentAngle;
 
   // La relecture pique les yeux. Qui a mit un goto ici?? (oups) #doWhile
-  //TODO: refaire. Avec un switch case clair: Mode maintien de position, mode rotation, mode déplacement. 
+  //TODO: refaire. Avec un switch case clair: Mode maintien de position, mode rotation, mode déplacement.
   targetSelection:;
 
   // Si on est arrivé à l'objectif, on ne fait plus rien
@@ -66,10 +66,10 @@ void Controller::update(double posX, double posY, double currentAngle){
     rotationOnly = false;
   }
 
+  // Calcul de la consigne en vitesse:
   if(rotationOnly){
     targetedSpeed = 0;
   }else{
-    // Calcul de la consigne en vitesse:
     idealSpeed = distanceToNode/MAX_ACCELERATION;
     if(abs(currentSpeed-idealSpeed)<MAX_ACCELERATION){
       targetedSpeed = idealSpeed;

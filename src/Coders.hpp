@@ -3,7 +3,7 @@
 #include <Encoder.h>
 class Coders{
   public:
-    Coders(int p11,int p12,int p21,int p22);
+    Coders(int pLeftB,int pLeftA,int pRightA,int pRightB);
     ~Coders();
     int left();
     int right();

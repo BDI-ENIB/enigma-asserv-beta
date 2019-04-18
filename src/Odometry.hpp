@@ -4,10 +4,19 @@
 class Odometry{
   public:
     /**
-     * @param {base coords}, half interwheel, wheel radius, coder steps per revolution
+     * @param:
+     *    {xO, y0, a0}:   base coords
+     *    L:              half-interwheel
+     *    R:              wheel radius
+     *    S:              coder steps per revolution
      */
     Odometry(double x0,double y0,double a0,double L,double R,int S);
-    void move(int cl,int cr); //left counter delta, right counter delta
+    /**
+     * @param:
+     *    cl:     left counter delta
+     *    cr:     right counter delta
+     */
+    void move(int cl,int cr);
     double getX();
     double getY();
     double getA();

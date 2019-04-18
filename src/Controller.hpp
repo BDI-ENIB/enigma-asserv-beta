@@ -4,12 +4,13 @@
 #include "PID.hpp"
 #include "Arduino.h"
 
-#define MAX_ACCELERATION 0.2
-#define MAX_ACCELERATION_ROTATION 0.1
-#define MAX_PWM 255
-#define PRECISION_DISTANCE 10
-#define PRECISION_ANGLE 0.2
+#define MAX_ACCELERATION 0.0002
+#define MAX_ACCELERATION_ROTATION 5
+#define MAX_PWM 15
+#define PRECISION_DISTANCE 20
+#define PRECISION_ANGLE 0.025
 #define DEMI_ECART_ROUES 160
+#define MAX_CHECKPOINT_AMOUNT 18
 
 typedef struct {double x,y;} Point;
 
@@ -17,10 +18,10 @@ class Controller{
   public:
     Controller(double P, double I, double D);
 
-    //TODO: passer à un système position/vitesse
-    /** Commandes de création de trajectoire
+    /**
+     * Commandes de création de trajectoire
      */
-     void setTarget(Point *checkpoints, int checkpointAmount, double targetedAngle);
+     void setTarget(Point checkpoints[], int checkpointAmount, double targetedAngle);
 
     /**
      * Commandes de génération de commande
@@ -29,9 +30,11 @@ class Controller{
     int getLCommand();
     int getRCommand();
 
+    void log();
+
   private:
     // Définition de la trajectoire
-    Point *checkpoints;
+    Point checkpoints[MAX_CHECKPOINT_AMOUNT];
     double targetedAngle;
     double targetedSpeed;
 

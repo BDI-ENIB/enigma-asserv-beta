@@ -10,7 +10,7 @@ class PID{
   private:
 
     double P, I, D, target;
-    double lastCommand, lastInput, cumulatedError;
+    double lastCommand, lastInput, lastDelta, cumulatedError;
     long lastUpdate;
 };
 

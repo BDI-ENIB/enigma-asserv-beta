@@ -10,7 +10,7 @@
 IntervalTimer controlTimer;
 Coders coders(36,35,33,34);
 Odometry odometry(1000,1000,0,265.0,16.0,20000); // X Y Alpha
-Controller controller(0.10,0,0); // PID
+Controller controller(0.02,0.00,0.00); // PID
 Motor leftMotor(3,4,5); // aka motor 1
 Motor rightMotor(10,26,27,true); // PWM, brake, direction
 
@@ -23,8 +23,8 @@ void setup(){
   pinMode(LED, OUTPUT);
 
   // On redéfinit la target
-  Point checkpoints[] = {{1000,1000},{1200,1000},{1200,1200},{1000,1200},{1000,1000},{1000,1000},{1200,1000},{1200,1200},{1000,1200},{1000,1000},{1000,1000},{1200,1000},{1200,1200},{1000,1200},{1000,1000}};
-  controller.setTarget(checkpoints, 15, -PI/2); // checkpints, nb de checkpoints, angle à l'arrivée
+  Point checkpoints[] = {{1000,1000},{1200,1000},{1000,1000}};
+  controller.setTarget(checkpoints, 3, -PI/2); // checkpints, nb de checkpoints, angle à l'arrivée
 
   // On lance l'asservissement
   controlTimer.begin(mainLoop, 4166);
@@ -33,7 +33,7 @@ void setup(){
 
 void loop(){
   //Serial.println((String)odometry.getX()+" "+odometry.getY());
-  //controller.log();
+  controller.log();
   delay(50);
   digitalWrite(LED, HIGH);
   delay(50);

@@ -34,7 +34,8 @@ void PID::update(double input){
   delta=target-input;
 
   // On incrémente l'erreur cumulée
-  cumulatedError+=delta;
+  cumulatedError+=delta*(micros()-lastUpdate)/1000;
+  lastUpdate=micros();
 
   // TODO: Jarter cette variable quand on a un changement de target. En fait, créer une fonction pour reset le I, et laisser le controller gérer
 

@@ -95,8 +95,8 @@ void Controller::update(double posX, double posY, double currentAngle){
     targetedRotationSpeed = currentRotationSpeed - MAX_ACCELERATION_ROTATION*dt;
   }
 
-  leftMotor->setTarget(targetedSpeed-targetedRotationSpeed);
-  rightMotor->setTarget(targetedSpeed+targetedRotationSpeed);
+  leftMotor->setTarget(targetedSpeed+targetedRotationSpeed);
+  rightMotor->setTarget(targetedSpeed-targetedRotationSpeed);
 
   leftMotor->update(currentSpeed-currentRotationSpeed*DEMI_ECART_ROUES);
   rightMotor->update(currentSpeed+currentRotationSpeed*DEMI_ECART_ROUES);

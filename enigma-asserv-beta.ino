@@ -13,6 +13,7 @@ Odometry odometry(1000,1000,0,260.0,16.0,4096); // X Y Alpha
 Controller controller(0.02,0.00,0.00); // PID
 Motor leftMotor(3,4,5,true); // aka motor 1
 Motor rightMotor(10,26,27,false); // PWM, brake, direction
+Point path[16]{};
 
 void setup(){
   // On ouvre la connexion
@@ -23,8 +24,9 @@ void setup(){
   pinMode(LED, OUTPUT);
 
   // On redéfinit la target
-  Point checkpoints[] = {{1000,1000},{1400,1000},{1400,-1400},{1000,1000}};
-  controller.setTarget(checkpoints, 4, -PI/2); // checkpints, nb de checkpoints, angle à l'arrivée
+  Point checkpoints[] = {{1000,1000}};
+  controller.setTarget(checkpoints, 1, 0); // checkpints, nb de checkpoints, angle à l'arrivée
+  // former: targetedAngle -> -PI/2
 
   // On lance l'asservissement
   controlTimer.begin(mainLoop, 4166);
@@ -32,12 +34,23 @@ void setup(){
 }
 
 void loop(){
-  //Serial.println((String)odometry.getX()+" "+odometry.getY());
+  #ifdef DEBUG
   controller.log();
   delay(50);
   digitalWrite(LED, HIGH);
   delay(50);
   digitalWrite(LED, LOW);
+  #else
+  String s = Serial.readStringUntil(';');
+  if(s.startsWith("forward:")){
+      // Commande possible: "forward:100"
+      int command = s.substring(8).toInt();
+      path[0]={odometry.getX()+command*cos(odometry.getA()), odometry.getY()+command*sin(odometry.getA())};
+      controller.setTarget(path,1,odometry.getA());
+  }else if(s.startsWith("whois")){
+      Serial.print("MotionBase;");
+  }
+  #endif
 }
 
 void mainLoop(){

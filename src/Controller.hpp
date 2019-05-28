@@ -12,7 +12,7 @@
 #define DEMI_ECART_ROUES 160
 #define MAX_CHECKPOINT_AMOUNT 18
 
-typedef struct {double x,y;} Point;
+typedef struct {double x=0; double y=0;} Point;
 
 class Controller{
   public:

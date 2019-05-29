@@ -77,5 +77,8 @@ void mainLoop(){
     if(!pause && enabled){
         leftMotor.setSpeed(controller.getLCommand());
         rightMotor.setSpeed(controller.getRCommand());
+    }else{
+        leftMotor.setSpeed(0);
+        rightMotor.setSpeed(0);
     }
 }

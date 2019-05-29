@@ -53,7 +53,13 @@ void loop(){
       // Commande possible: "forward:100"
       int command = s.substring(8).toInt();
       path[0]={odometry.getX()+command*cos(odometry.getA()), odometry.getY()+command*sin(odometry.getA())};
-      controller.setTarget(path,1,odometry.getA());
+      controller.setTarget(path,1,(command>0)?odometry.getA():PI-odometry.getA());
+  }else if(s.startsWith("rotate:")){
+      // Commande possible: "rotate:3.1415"
+      double command = s.substring(7).toFloat();
+      Serial.print(command);
+      path[0]={odometry.getX(), odometry.getY()};
+      controller.setTarget(path,0,odometry.getA()+command);
   }else if(s.startsWith("whois")){
       Serial.print("MotionBase;");
   }else if(s.startsWith("pause")){

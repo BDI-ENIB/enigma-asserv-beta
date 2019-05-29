@@ -13,21 +13,21 @@ Controller::Controller(double P, double I, double D){
   currentCheckpoint = 1; //Par défaut, il est considéré que nous sommes arrivés à destination.... oui, sérieusement x)
 }
 
-void Controller::setTarget(Point checkpoints[], int checkpointAmount, double targetedAngle){
-  for(int i = 0; i<checkpointAmount;++i){
-    this->checkpoints[i]=checkpoints[i];
-  }
-  this->targetedAngle = targetedAngle;
-
-  this->checkpointAmount = checkpointAmount;
-  currentCheckpoint = 0;
-  rotationOnly = true;
-}
-
 double circstrain(double c){
   while(c<-3.1415)c+=2*3.1415;
   while(c>3.1415)c-=2*3.1415;
   return c;
+}
+
+void Controller::setTarget(Point checkpoints[], int checkpointAmount, double targetedAngle){
+  for(int i = 0; i<checkpointAmount;++i){
+    this->checkpoints[i]=checkpoints[i];
+  }
+  this->targetedAngle = circstrain(targetedAngle);
+
+  this->checkpointAmount = checkpointAmount;
+  currentCheckpoint = 0;
+  rotationOnly = true;
 }
 
 // Cache
@@ -48,19 +48,23 @@ void Controller::update(double posX, double posY, double currentAngle){
 
   // La relecture pique les yeux. Qui a mit un goto ici?? (oups) #doWhile
   //TODO: refaire. Avec un switch case clair: Mode maintien de position, mode rotation, mode déplacement.
+  //TODO: Je l'ai pas fait! Histoire de laisser du fun à la génération future. Btw ça vous parles les HashMaps?
   targetSelection:;
 
   // Si on est arrivé à l'objectif, on ne fait plus rien
   if(currentCheckpoint>=checkpointAmount){
-    return;
+      if(!rotationOnly){
+          return;
+      }
+      distanceToNode=0;
+      angleToTarget=circstrain(targetedAngle-currentAngle);
+  }else{
+      // calcul de la distance et de l'angle à l'objectif:
+      distanceToNode=sqrt(pow(checkpoints[currentCheckpoint].x-posX,2)+pow(checkpoints[currentCheckpoint].y-posY,2));
+      angleToTarget=circstrain(atan2(checkpoints[currentCheckpoint].y-posY,checkpoints[currentCheckpoint].x-posX)-currentAngle); // cet angle doit tendre vers 0
+      //log();
   }
-
-  // calcul de la distance et de l'angle à l'objectif:
-  distanceToNode=sqrt(pow(checkpoints[currentCheckpoint].x-posX,2)+pow(checkpoints[currentCheckpoint].y-posY,2));
-  angleToTarget=circstrain(atan2(checkpoints[currentCheckpoint].y-posY,checkpoints[currentCheckpoint].x-posX)-currentAngle); // cet angle doit tendre vers 0
-  //log();
-
-  if(distanceToNode<PRECISION_DISTANCE){
+  if(distanceToNode<PRECISION_DISTANCE && !rotationOnly){
     //Serial.println("#######Changement de cible!#######");
     currentCheckpoint++;
     rotationOnly = true;
@@ -104,11 +108,11 @@ void Controller::update(double posX, double posY, double currentAngle){
 }
 
 int Controller::getLCommand(){
-  return (currentCheckpoint>=checkpointAmount)?0:max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()));
+  return (currentCheckpoint>=checkpointAmount&&!rotationOnly)?0:max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()));
 }
 
 int Controller::getRCommand(){
-  return (currentCheckpoint>=checkpointAmount)?0:max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()));
+  return (currentCheckpoint>=checkpointAmount&&!rotationOnly)?0:max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()));
 }
 
 

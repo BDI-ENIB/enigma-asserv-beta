@@ -14,6 +14,7 @@ Controller controller(0.02,0.00,0.00); // PID
 Motor leftMotor(3,4,5,true); // aka motor 1
 Motor rightMotor(10,26,27,false); // PWM, brake, direction
 Point path[16]{};
+volatile bool pause = false;
 
 void setup(){
   // On ouvre la connexion
@@ -42,6 +43,10 @@ void loop(){
   digitalWrite(LED, LOW);
   #else
   String s = Serial.readStringUntil(';');
+  if(s.equals("")) return;
+  for(unsigned int i = 0; i<s.length(); i++){
+      if(s.charAt(i)=='\n') return;
+  }
   if(s.startsWith("forward:")){
       // Commande possible: "forward:100"
       int command = s.substring(8).toInt();
@@ -49,6 +54,12 @@ void loop(){
       controller.setTarget(path,1,odometry.getA());
   }else if(s.startsWith("whois")){
       Serial.print("MotionBase;");
+  }else if(s.startsWith("pause")){
+    pause = true;
+}else if(s.startsWith("resume")){
+    pause = false;
+  }else{
+      Serial.print("Undefined Command: '"+s+"';");
   }
   #endif
 }
@@ -57,6 +68,8 @@ void mainLoop(){
     odometry.move(coders.right(),coders.left());
     controller.update(odometry.getX(),odometry.getY(),odometry.getA()); // cm -> mm
 
-    leftMotor.setSpeed(controller.getLCommand());
-    rightMotor.setSpeed(controller.getRCommand());
+    if(!pause){
+        leftMotor.setSpeed(controller.getLCommand());
+        rightMotor.setSpeed(controller.getRCommand());
+    }
 }

@@ -60,9 +60,9 @@ void loop(){
     pause = true;
   }else if(s.startsWith("resume")){
     pause = false;
-}else if(s.startsWith("enabled")){
+}else if(s.startsWith("activate")){
     enabled = true;
-}else if(s.startsWith("disabled")){
+}else if(s.startsWith("deactivate")){
     enabled = false;
   }else{
       Serial.print("Undefined Command: '"+s+"';");

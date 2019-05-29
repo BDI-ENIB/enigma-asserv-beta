@@ -15,6 +15,7 @@ Motor leftMotor(3,4,5,true); // aka motor 1
 Motor rightMotor(10,26,27,false); // PWM, brake, direction
 Point path[16]{};
 volatile bool pause = false;
+volatile bool enabled = false;
 
 void setup(){
   // On ouvre la connexion
@@ -57,8 +58,12 @@ void loop(){
       Serial.print("MotionBase;");
   }else if(s.startsWith("pause")){
     pause = true;
-}else if(s.startsWith("resume")){
+  }else if(s.startsWith("resume")){
     pause = false;
+}else if(s.startsWith("enabled")){
+    enabled = true;
+}else if(s.startsWith("disabled")){
+    enabled = false;
   }else{
       Serial.print("Undefined Command: '"+s+"';");
   }
@@ -69,7 +74,7 @@ void mainLoop(){
     odometry.move(coders.right(),coders.left());
     controller.update(odometry.getX(),odometry.getY(),odometry.getA()); // cm -> mm
 
-    if(!pause){
+    if(!pause && enabled){
         leftMotor.setSpeed(controller.getLCommand());
         rightMotor.setSpeed(controller.getRCommand());
     }

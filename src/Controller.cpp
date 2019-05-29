@@ -53,6 +53,7 @@ void Controller::update(double posX, double posY, double currentAngle){
   // Si on est arrivé à l'objectif, on ne fait plus rien
   if(currentCheckpoint>=checkpointAmount){
     return;
+    Serial.print(";movementFinished;");
   }
 
   // calcul de la distance et de l'angle à l'objectif:

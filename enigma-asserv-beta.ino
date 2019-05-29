@@ -42,6 +42,7 @@ void loop(){
   delay(50);
   digitalWrite(LED, LOW);
   #else
+  digitalWrite(LED, HIGH);
   String s = Serial.readStringUntil(';');
   if(s.equals("")) return;
   for(unsigned int i = 0; i<s.length(); i++){

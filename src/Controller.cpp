@@ -53,7 +53,6 @@ void Controller::update(double posX, double posY, double currentAngle){
   // Si on est arrivé à l'objectif, on ne fait plus rien
   if(currentCheckpoint>=checkpointAmount){
     return;
-    Serial.print(";movementFinished;");
   }
 
   // calcul de la distance et de l'angle à l'objectif:
@@ -65,6 +64,7 @@ void Controller::update(double posX, double posY, double currentAngle){
     //Serial.println("#######Changement de cible!#######");
     currentCheckpoint++;
     rotationOnly = true;
+    if(currentCheckpoint==checkpointAmount) Serial.print("movementFinished;");
     goto targetSelection;
   }
 

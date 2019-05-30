@@ -12,7 +12,7 @@
 #define TIMEOUT_MILLIS 4000
 #define PRECISION_ANGLE 0.025
 #define THRESHOLD_ROTATION_SPEED 0.01
-#define OUTPUT_PRECISON_MODE 25
+#define OUTPUT_PRECISON_MODE 35
 #define DEMI_ECART_ROUES 160
 #define MAX_CHECKPOINT_AMOUNT 18
 
@@ -20,7 +20,7 @@ typedef struct {double x=0; double y=0;} Point;
 
 class Controller{
   public:
-    Controller(double P, double I, double D);
+    Controller(double P, double I, double D, double initialX=1000, double initialY=1000, double initialAngle=0);
 
     /**
      * Commandes de création de trajectoire
@@ -33,6 +33,7 @@ class Controller{
     void update(double posX, double posY, double currentAngle);
     int getLCommand();
     int getRCommand();
+    double getTargetedAngle();
 
     void log();
 

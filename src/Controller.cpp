@@ -1,6 +1,6 @@
 #include "Controller.hpp"
 
-Controller::Controller(double P, double I, double D){
+Controller::Controller(double P, double I, double D, double initialX,double initialY,double initialAngle){
   // Asserv en vitesse => commande de base à 0, robot immobile
   leftMotor = new PID(P, I, D, 0);
   rightMotor = new PID(P, I, D, 0);
@@ -8,6 +8,8 @@ Controller::Controller(double P, double I, double D){
   lastUpdate=micros();
   lastPosY = 0.0;
   lastPosX = 0.0;
+
+  targetedAngle=initialAngle;
 
   checkpointAmount = 0; //Car la liste checkpoints[] n'est pas initialisée
   currentCheckpoint = 1; //Par défaut, il est considéré que nous sommes arrivés à destination.... oui, sérieusement x)
@@ -17,6 +19,10 @@ double circstrain(double c){
   while(c<-3.1415)c+=2*3.1415;
   while(c>3.1415)c-=2*3.1415;
   return c;
+}
+
+double Controller::getTargetedAngle(){
+    return targetedAngle;
 }
 
 void Controller::setTarget(Point checkpoints[], int checkpointAmount, double targetedAngle){

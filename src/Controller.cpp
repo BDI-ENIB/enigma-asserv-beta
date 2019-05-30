@@ -32,9 +32,8 @@ void Controller::setTarget(Point checkpoints[], int checkpointAmount, double tar
 
 // Cache
 double dt, angleToTarget, distanceToNode, currentSpeed, idealSpeed, idealRotationSpeed, currentRotationSpeed, targetedRotationSpeed;
-
+long timeOutChrono = 0; bool countDownStarted = false;
 void Controller::update(double posX, double posY, double currentAngle){
-
   circstrain(currentAngle);
 
   currentSpeed = sqrt(pow(lastPosX-posX,2)+pow(lastPosY-posY, 2))/(micros()-lastUpdate);
@@ -64,19 +63,43 @@ void Controller::update(double posX, double posY, double currentAngle){
       angleToTarget=circstrain(atan2(checkpoints[currentCheckpoint].y-posY,checkpoints[currentCheckpoint].x-posX)-currentAngle); // cet angle doit tendre vers 0
       //log();
   }
+
+  if(distanceToNode<PRECISION_DISTANCE_TIMEOUT){
+      if(!countDownStarted){
+          countDownStarted=true;
+          timeOutChrono=millis();
+      }else{
+          if(millis()-timeOutChrono>TIMEOUT_MILLIS){
+              if(!rotationOnly){
+                  currentCheckpoint++;
+                  rotationOnly=true;
+                  Serial.print("translationSkipped;");
+              }else{
+                  rotationOnly=false;
+                  Serial.print("rotationSkipped;movementFinished;");
+              }
+              countDownStarted=false;
+              goto targetSelection;
+          }
+      }
+  }
+
   if(distanceToNode<PRECISION_DISTANCE && !rotationOnly){
     //Serial.println("#######Changement de cible!#######");
     currentCheckpoint++;
     rotationOnly = true;
+    countDownStarted=false;
     goto targetSelection;
   }
 
   if(abs(angleToTarget)<PRECISION_ANGLE && currentRotationSpeed*1000000<THRESHOLD_ROTATION_SPEED){
     if(rotationOnly && currentCheckpoint==checkpointAmount){
         Serial.print("movementFinished;");
+        countDownStarted=false;
         rotationOnly = false;
         return;
     }
+    countDownStarted=false;
     rotationOnly = false;
   }
 
@@ -121,7 +144,7 @@ int Controller::getLCommand(){
     }else if(currentCheckpoint>=checkpointAmount){
         return 0;
     }else{
-        return max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()));
+        return max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()*(abs(rightMotor->getCommand())<30?2:1)));
     }
 }
 
@@ -135,7 +158,7 @@ int Controller::getRCommand(){
     }else if(currentCheckpoint>=checkpointAmount){
         return 0;
     }else{
-        return max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()));
+        return max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()*(abs(rightMotor->getCommand())<30?2:1)));
     }
 }
 

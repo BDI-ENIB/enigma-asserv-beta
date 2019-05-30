@@ -10,7 +10,7 @@
 IntervalTimer controlTimer;
 Coders coders(35,36,34,33);
 Odometry odometry(1000,1000,0,260.0,16.0,4096); // X Y Alpha
-Controller controller(0.045,0.0,0.2); // PID
+Controller controller(0.045,0.0,0.6); // PID
 Motor leftMotor(3,4,5,true); // aka motor 1
 Motor rightMotor(10,26,27,false); // PWM, brake, direction
 Point path[16]{};

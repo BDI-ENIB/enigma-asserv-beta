@@ -68,11 +68,15 @@ void Controller::update(double posX, double posY, double currentAngle){
     //Serial.println("#######Changement de cible!#######");
     currentCheckpoint++;
     rotationOnly = true;
-    if(currentCheckpoint==checkpointAmount) Serial.print("movementFinished;");
     goto targetSelection;
   }
 
-  if(abs(angleToTarget)<PRECISION_ANGLE){
+  if(abs(angleToTarget)<PRECISION_ANGLE && currentRotationSpeed*1000000<THRESHOLD_ROTATION_SPEED){
+    if(rotationOnly && currentCheckpoint==checkpointAmount){
+        Serial.print("movementFinished;");
+        rotationOnly = false;
+        return;
+    }
     rotationOnly = false;
   }
 
@@ -108,11 +112,31 @@ void Controller::update(double posX, double posY, double currentAngle){
 }
 
 int Controller::getLCommand(){
-  return (currentCheckpoint>=checkpointAmount&&!rotationOnly)?0:max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()));
+    if(rotationOnly){
+        if(leftMotor->getCommand()>0){
+            return max(OUTPUT_PRECISON_MODE,leftMotor->getCommand());
+        }else{
+            return min(-OUTPUT_PRECISON_MODE,leftMotor->getCommand());
+        }
+    }else if(currentCheckpoint>=checkpointAmount){
+        return 0;
+    }else{
+        return max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()));
+    }
 }
 
 int Controller::getRCommand(){
-  return (currentCheckpoint>=checkpointAmount&&!rotationOnly)?0:max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()));
+    if(rotationOnly){
+        if(rightMotor->getCommand()>0){
+            return max(OUTPUT_PRECISON_MODE,rightMotor->getCommand());
+        }else{
+            return min(-OUTPUT_PRECISON_MODE,rightMotor->getCommand());
+        }
+    }else if(currentCheckpoint>=checkpointAmount){
+        return 0;
+    }else{
+        return max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()));
+    }
 }
 
 

@@ -57,7 +57,7 @@ void loop(){
   }else if(s.startsWith("rotate:")){
       // Commande possible: "rotate:3.1415"
       double command = s.substring(7).toFloat();
-      Serial.print(command);
+      Serial.print(String(command));
       path[0]={odometry.getX(), odometry.getY()};
       controller.setTarget(path,0,odometry.getA()+command);
   }else if(s.startsWith("whois")){

@@ -140,32 +140,37 @@ void Controller::update(double posX, double posY, double currentAngle){
   rightMotor->update(currentSpeed+currentRotationSpeed*DEMI_ECART_ROUES);
 }
 
+int command;
 int Controller::getLCommand(){
     if(rotationOnly){
         if(leftMotor->getCommand()>0){
-            return max(OUTPUT_PRECISON_MODE,leftMotor->getCommand());
+            command = max(OUTPUT_PRECISON_MODE,leftMotor->getCommand());
         }else{
-            return min(-OUTPUT_PRECISON_MODE,leftMotor->getCommand());
+            command = min(-OUTPUT_PRECISON_MODE,leftMotor->getCommand());
         }
     }else if(currentCheckpoint>=checkpointAmount){
-        return 0;
+        command = 0;
     }else{
-        return max(-MAX_PWM, min(MAX_PWM, leftMotor->getCommand()*(abs(rightMotor->getCommand())<30?2:1)));
+        command = leftMotor->getCommand();
+                  //*(abs(leftMotor->getCommand())<30?2:1); // Coup de pouce
     }
+    return max(-MAX_PWM, min(MAX_PWM, command));
 }
 
 int Controller::getRCommand(){
     if(rotationOnly){
         if(rightMotor->getCommand()>0){
-            return max(OUTPUT_PRECISON_MODE,rightMotor->getCommand());
+            command = max(OUTPUT_PRECISON_MODE,rightMotor->getCommand());
         }else{
-            return min(-OUTPUT_PRECISON_MODE,rightMotor->getCommand());
+            command = min(-OUTPUT_PRECISON_MODE,rightMotor->getCommand());
         }
     }else if(currentCheckpoint>=checkpointAmount){
-        return 0;
+        command = 0;
     }else{
-        return max(-MAX_PWM, min(MAX_PWM, rightMotor->getCommand()*(abs(rightMotor->getCommand())<30?2:1)));
+        command = rightMotor->getCommand();
+                  //*(abs(rightMotor->getCommand())<30?2:1); // Coup de pouce
     }
+    return max(-MAX_PWM, min(MAX_PWM, command));
 }
 
 

@@ -78,9 +78,9 @@ void loop(){
 
 void mainLoop(){
     odometry.move(coders.right(),coders.left());
-    controller.update(odometry.getX(),odometry.getY(),odometry.getA()); // cm -> mm
 
     if(!pause && enabled){
+        controller.update(odometry.getX(),odometry.getY(),odometry.getA()); // cm -> mm
         leftMotor.setSpeed(controller.getLCommand());
         rightMotor.setSpeed(controller.getRCommand());
     }else{
